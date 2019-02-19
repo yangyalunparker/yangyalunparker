@@ -1,0 +1,21 @@
+int sensorVal;
+float frequencyVal;
+
+void setup() {
+  // put your setup code here, to run once:
+Serial.begin(9600);
+pinMode(8, OUTPUT);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+// READ the analog input on A0
+sensorVal = analogRead(A0);
+// print it to the serial monitor
+Serial.print("Sensor value: ");
+Serial.println(sensorVal);
+
+frequencyVal = map(sensorVal, 100, 950, 200, 980);
+
+tone(8, frequencyVal);
+}
