@@ -1,0 +1,31 @@
+int analogPin = A0; // declare a global constant to give the LEDs pin number a name
+int analogPin2 = A1;
+int analogValue1; // declare an int to hold the value returned by the potentiometer, use analogValue
+int analogValue2;
+
+ 
+
+void setup() {
+// put your setup code here, to run once:
+Serial.begin(9600); // initialize serial communication
+
+}
+
+void loop() {
+// put your main code here, to run repeatedly:
+analogValue1 = analogRead(analogPin);// reading analog value
+int serialValue1 = map(analogValue1, 25, 160, 0, 255);
+//Serial.print(“photocell: “);
+Serial.print(analogValue1); // print analog value to serial monitor (ASCII)
+Serial.print(",");
+//Serial.write(serialValue1); // print analog value to serial monitor (binary)
+
+delay(1); // stabilizes the serial port
+
+analogValue2 = analogRead(analogPin2);// reading analog value
+int serialValue2 = map(analogValue2, 0, 1023, 0, 255);
+//Serial.print(“pot: “);
+Serial.println(serialValue2); // sends ASCII
+//Serial.write(serialValue2); // sends binary
+
+}
