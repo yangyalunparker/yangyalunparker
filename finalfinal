@@ -1,0 +1,81 @@
+#include <Servo.h>
+// include the servo library
+Servo myServo;
+// creates an instance of the servo object to control a servo
+
+#include "pitches.h"
+// speaker
+
+#define ServoPin 3
+#define trigPin 13
+#define echoPin 12
+#define led 11
+#define led2 10
+
+int melody[] = {
+  NOTE_C4, NOTE_G3, NOTE_G3, NOTE_A3, NOTE_G3, 0, NOTE_B3, NOTE_C4
+};
+
+// note durations: 4 = quarter note, 8 = eighth note, etc.:
+int noteDurations[] = {
+  4, 8, 8, 4, 4, 4, 4, 4
+};
+
+bool isOpen = false;
+
+void setup() {
+  Serial.begin (9600);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(led, OUTPUT);
+  pinMode(led2, OUTPUT);
+  myServo.attach(ServoPin);
+}
+void loop() {
+  long duration, distance;
+  digitalWrite(trigPin, LOW);  // Added this line
+  delayMicroseconds(2); // Added this line
+  digitalWrite(trigPin, HIGH);
+//  delayMicroseconds(1000); - Removed this line
+  delayMicroseconds(10); // Added this line
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration/2) / 29.1;
+  if (distance < 4) {  // This is where the LED On/Off happens
+    digitalWrite(led,HIGH); // When the Red condition is met, the Green LED should turn off
+  digitalWrite(led2,LOW);
+}
+  else {
+    digitalWrite(led,LOW);
+    digitalWrite(led2,HIGH);
+  }
+  if (distance >= 22 || distance <= 0){
+    Serial.println("Out of range");
+    myServo.write(0); //close bo
+    isOpen = false;
+  }
+  else {
+    myServo.write(90); // open box
+    Serial.print(distance);
+    Serial.println(" cm");
+    if(!isOpen){
+      for (int thisNote = 0; thisNote < 8; thisNote++) {
+
+        // to calculate the note duration, take one second divided by the note type.
+        //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+        int noteDuration = 1000 / noteDurations[thisNote];
+        tone(8, melody[thisNote], noteDuration);
+    
+        // to distinguish the notes, set a minimum time between them.
+        // the note's duration + 30% seems to work well:
+        int pauseBetweenNotes = noteDuration * 1.30;
+        delay(pauseBetweenNotes);
+        // stop the tone playing:
+        noTone(8);
+      }
+      isOpen = true;
+    }
+    
+  }
+  delay(500);
+}
